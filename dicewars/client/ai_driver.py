@@ -78,6 +78,12 @@ class AIDriver:
             message = game.input_queue.get(block=True, timeout=None)
             try:
                 if not self.handle_server_message(message):
+                    # notify AI name of the winner AI
+                    try:
+                        self.ai.on_round_end(message['winner'])
+                    except AttributeError:
+                        pass
+
                     exit(0)
             except JSONDecodeError:
                 self.logger.error("Invalid message from server.")
