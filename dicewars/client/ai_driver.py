@@ -73,10 +73,10 @@ class AIDriver:
         """Main AI agent loop
         """
         game = self.game
-        i = -1
+        previous_was_end_turn = False
 
         while True:
-            i += 1
+
             message = game.input_queue.get(block=True, timeout=None)
             try:
                 if not self.handle_server_message(message):
@@ -94,8 +94,9 @@ class AIDriver:
             self.current_player_name = game.current_player.get_name()
             if self.current_player_name == self.player_name and not self.waitingForResponse:
                 try:
-                    if i > 0:
+                    if previous_was_end_turn:
                         self.ai.on_round_end(copy.deepcopy(self.board))
+                        previous_was_end_turn = False
 
                 except AttributeError:
                     pass
@@ -114,6 +115,9 @@ class AIDriver:
                             time_left
                         )
                     self.process_command(command)
+                    if isinstance(command, EndTurnCommand):
+                        previous_was_end_turn = True
+
                 except TimeoutError:
                     self.logger.warning("Forced 'end_turn' because of timeout")
                     self.send_message('end_turn')
