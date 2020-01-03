@@ -73,16 +73,19 @@ class AIDriver:
         """Main AI agent loop
         """
         game = self.game
+        i = -1
 
         while True:
+            i += 1
             message = game.input_queue.get(block=True, timeout=None)
             try:
                 if not self.handle_server_message(message):
                     # notify AI name of the winner AI
-                    try:
-                        self.ai.on_round_end(message['winner'])
-                    except AttributeError:
-                        pass
+                    if message['type'] == 'game_end':
+                        try:
+                            self.ai.on_game_end(message['winner'])
+                        except AttributeError:
+                            pass
 
                     exit(0)
             except JSONDecodeError:
@@ -90,6 +93,13 @@ class AIDriver:
                 exit(1)
             self.current_player_name = game.current_player.get_name()
             if self.current_player_name == self.player_name and not self.waitingForResponse:
+                try:
+                    if i > 0:
+                        self.ai.on_round_end(copy.deepcopy(self.board))
+
+                except AttributeError:
+                    pass
+
                 if self.ai_disabled:
                     self.logger.warning("The AI has already misbehaved, just end-turning.")
                     self.send_message('end_turn')
