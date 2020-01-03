@@ -83,7 +83,7 @@ class AIDriver:
                     # notify AI name of the winner AI
                     if message['type'] == 'game_end':
                         try:
-                            self.ai.on_game_end(message['winner'])
+                            self.ai.on_game_end(message['winner'], copy.deepcopy(self.board))
                         except AttributeError:
                             pass
 
