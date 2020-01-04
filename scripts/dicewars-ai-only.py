@@ -73,12 +73,18 @@ def main():
             )
             summaries.append(game_summary)
         except KeyboardInterrupt:
+            lockfile = open('/mnt/w/lock', 'w')
+            fcntl.flock(lockfile, fcntl.LOCK_EX)
             for p in procs:
                 p.kill()
+            fcntl.flock(lockfile, fcntl.LOCK_UN)
             break
         except AttributeError:
+            lockfile = open('/mnt/w/lock', 'w')
+            fcntl.flock(lockfile, fcntl.LOCK_EX)
             for p in procs:
                 p.kill()
+            fcntl.flock(lockfile, fcntl.LOCK_UN)
     if args.report:
         sys.stdout.write('\r')
 

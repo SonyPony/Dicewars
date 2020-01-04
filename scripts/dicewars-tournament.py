@@ -126,8 +126,11 @@ def main():
                 all_games.append(game_summary)
     except (Exception, KeyboardInterrupt) as e:
         sys.stderr.write("Breaking the tournament because of {}\n".format(repr(e)))
+        lockfile = open('/mnt/w/lock', 'w')
+        fcntl.flock(lockfile, fcntl.LOCK_EX)
         for p in procs:
             p.kill()
+        fcntl.flock(lockfile, fcntl.LOCK_UN)
 
     reporter.clean()
 

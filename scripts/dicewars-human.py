@@ -93,8 +93,13 @@ def main():
             p.wait()
 
     except KeyboardInterrupt:
+        lockfile = open('/mnt/w/lock', 'w')
+        fcntl.flock(lockfile, fcntl.LOCK_EX)
         for p in procs:
             p.kill()
+
+        fcntl.flock(lockfile, fcntl.LOCK_UN)
+
 
 
 if __name__ == '__main__':
