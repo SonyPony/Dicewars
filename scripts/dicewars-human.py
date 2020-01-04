@@ -2,9 +2,10 @@
 from signal import signal, SIGCHLD
 from subprocess import Popen
 from argparse import ArgumentParser
-from time import sleep
 
 from utils import log_file_producer
+
+import fcntl
 
 
 parser = ArgumentParser(prog='Dice_Wars')
@@ -23,12 +24,15 @@ procs = []
 def signal_handler(signum, frame):
     """Handler for SIGCHLD signal that terminates server and clients
     """
+    lockfile = open('/mnt/w/lock', 'w')
+    fcntl.flock(lockfile, fcntl.LOCK_EX)
     for p in procs:
         try:
-            sleep(2)
             p.kill()
         except ProcessLookupError:
             pass
+
+    fcntl.flock(lockfile, fcntl.LOCK_UN)
 
 
 def main():

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import sys
+import fcntl
 from signal import signal, SIGCHLD
 from argparse import ArgumentParser
 from time import sleep
@@ -28,12 +29,15 @@ procs = []
 def signal_handler(signum, frame):
     """Handler for SIGCHLD signal that terminates server and clients
     """
-    sleep(4)
+    lockfile = open('/mnt/w/lock', 'w')
+    fcntl.flock(lockfile, fcntl.LOCK_EX)
     for p in procs:
         try:
             p.kill()
         except ProcessLookupError:
             pass
+
+    fcntl.flock(lockfile, fcntl.LOCK_UN)
 
 
 def main():

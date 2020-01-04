@@ -4,9 +4,12 @@ from argparse import ArgumentParser
 
 import math
 import itertools
+import fcntl
+
 from utils import run_ai_only_game, get_nickname, BoardDefinition, SingleLineReporter, PlayerPerformance
 from utils import TournamentCombatantsProvider, EvaluationCombatantsProvider
 from utils import column_t
+
 import random
 import sys
 import pickle
@@ -32,11 +35,15 @@ procs = []
 def signal_handler(signum, frame):
     """Handler for SIGCHLD signal that terminates server and clients
     """
+    lockfile = open('/mnt/w/lock', 'w')
+    fcntl.flock(lockfile, fcntl.LOCK_EX)
     for p in procs:
         try:
             p.kill()
         except ProcessLookupError:
             pass
+
+    fcntl.flock(lockfile, fcntl.LOCK_UN)
 
 
 PLAYING_AIs = [
