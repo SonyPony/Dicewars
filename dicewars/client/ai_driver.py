@@ -15,8 +15,8 @@ def TimeoutHandler(signum, handler):
     raise TimeoutError('')
 
 
-TIME_LIMIT_CONSTRUCTOR = 10.0  # in seconds, for AI constructor
-FISCHER_INIT = 10.0  # seconds
+TIME_LIMIT_CONSTRUCTOR = 1000.0  # in seconds, for AI constructor
+FISCHER_INIT = 1000.0  # seconds
 FISCHER_INCREMENT = 0.1  # seconds
 
 
@@ -75,8 +75,9 @@ class AIDriver:
         game = self.game
         previous_was_end_turn = False
 
+        i = -1
         while True:
-
+            i += 1
             message = game.input_queue.get(block=True, timeout=None)
             try:
                 if not self.handle_server_message(message):
@@ -84,7 +85,8 @@ class AIDriver:
                     if message['type'] == 'game_end':
                         try:
                             self.ai.on_game_end(message['winner'], copy.deepcopy(self.board))
-                        except AttributeError:
+
+                        except AttributeError as e:
                             pass
 
                     exit(0)
@@ -94,8 +96,8 @@ class AIDriver:
             self.current_player_name = game.current_player.get_name()
             if self.current_player_name == self.player_name and not self.waitingForResponse:
                 try:
-                    if previous_was_end_turn:
-                        self.ai.on_round_end(copy.deepcopy(self.board))
+                    if i > 0:
+                        self.ai.on_round_end(copy.deepcopy(self.board), previous_was_end_turn)
                         previous_was_end_turn = False
 
                 except AttributeError:
