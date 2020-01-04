@@ -2,6 +2,7 @@
 from signal import signal, SIGCHLD
 from subprocess import Popen
 from argparse import ArgumentParser
+from time import sleep
 
 from utils import log_file_producer
 
@@ -24,6 +25,7 @@ def signal_handler(signum, frame):
     """
     for p in procs:
         try:
+            sleep(2)
             p.kill()
         except ProcessLookupError:
             pass

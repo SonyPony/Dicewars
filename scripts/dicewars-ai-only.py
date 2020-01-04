@@ -2,6 +2,7 @@
 import sys
 from signal import signal, SIGCHLD
 from argparse import ArgumentParser
+from time import sleep
 
 from dicewars.server.game.summary import get_win_rates
 from utils import run_ai_only_game, ListStats, BoardDefinition
@@ -27,6 +28,7 @@ procs = []
 def signal_handler(signum, frame):
     """Handler for SIGCHLD signal that terminates server and clients
     """
+    sleep(4)
     for p in procs:
         try:
             p.kill()
